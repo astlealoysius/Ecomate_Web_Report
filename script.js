@@ -22,12 +22,13 @@ let markers = [];
 // DOM Elements
 const loginModal = document.getElementById('loginModal');
 const appContainer = document.getElementById('appContainer');
-const loginForm = document.querySelector('.login-form');
 const emailInput = document.getElementById('email');
 const passwordInput = document.getElementById('password');
 const loginBtn = document.getElementById('loginBtn');
-const loginError = document.getElementById('loginError');
-const loadingSpinner = document.querySelector('.loading-spinner');
+const errorMessage = document.getElementById('errorMessage');
+const loadingSpinner = document.getElementById('loadingSpinner');
+const notification = document.getElementById('notification');
+const notificationMessage = document.getElementById('notificationMessage');
 
 // Show loading spinner
 function showLoading() {
@@ -41,8 +42,11 @@ function hideLoading() {
 
 // Show error message
 function showError(message) {
-    loginError.textContent = message;
-    loginError.style.display = 'block';
+    errorMessage.textContent = message;
+    errorMessage.style.display = 'block';
+    setTimeout(() => {
+        errorMessage.style.display = 'none';
+    }, 3000);
 }
 
 // Handle login
@@ -59,6 +63,10 @@ async function handleLogin(e) {
     showLoading();
     try {
         await auth.signInWithEmailAndPassword(email, password);
+        // Clear the form
+        emailInput.value = '';
+        passwordInput.value = '';
+        errorMessage.style.display = 'none';
     } catch (error) {
         hideLoading();
         switch (error.code) {
@@ -71,6 +79,7 @@ async function handleLogin(e) {
                 break;
             default:
                 showError('An error occurred. Please try again');
+                console.error('Login error:', error);
         }
     }
 }
@@ -332,18 +341,159 @@ function fetchReports() {
     });
 }
 
+// Function to add sample data if none exists
+async function addSampleData() {
+    const snapshot = await database.ref('reports').once('value');
+    if (!snapshot.exists()) {
+        const sampleReports = [
+            {
+                id: '1',
+                title: 'Illegal Dumping at River Bank',
+                description: 'Large amounts of construction waste dumped near the river bank. This needs immediate attention.',
+                location: 'Riverside Park',
+                status: 'pending',
+                timestamp: Date.now(),
+                coordinates: {
+                    lat: 12.9716,
+                    lng: 77.5946
+                },
+                imageUrl: 'https://images.unsplash.com/photo-1530587191325-3db1d0093e5b'
+            },
+            {
+                id: '2',
+                title: 'Air Pollution from Factory',
+                description: 'Heavy smoke emission from the industrial area affecting air quality in residential zones.',
+                location: 'Industrial District',
+                status: 'resolved',
+                timestamp: Date.now() - 86400000,
+                coordinates: {
+                    lat: 12.9516,
+                    lng: 77.5846
+                },
+                imageUrl: 'https://images.unsplash.com/photo-1569097263761-9fa00b5d3b7d'
+            },
+            {
+                id: '3',
+                title: 'Water Contamination',
+                description: 'Chemical discharge in lake causing water discoloration and affecting aquatic life.',
+                location: 'City Lake',
+                status: 'pending',
+                timestamp: Date.now() - 172800000,
+                coordinates: {
+                    lat: 12.9616,
+                    lng: 77.5746
+                },
+                imageUrl: 'https://images.unsplash.com/photo-1621451537084-482c73073a0f'
+            },
+            {
+                id: '4',
+                title: 'Deforestation Alert',
+                description: 'Unauthorized tree cutting observed in protected forest area. Multiple heavy machinery spotted.',
+                location: 'Green Forest Zone',
+                status: 'pending',
+                timestamp: Date.now() - 259200000,
+                coordinates: {
+                    lat: 12.9816,
+                    lng: 77.6046
+                },
+                imageUrl: 'https://images.unsplash.com/photo-1615411640812-5c2c5ea03c2c'
+            },
+            {
+                id: '5',
+                title: 'Plastic Waste on Beach',
+                description: 'Large accumulation of plastic waste on the beach shoreline. Marine life at risk.',
+                location: 'City Beach',
+                status: 'resolved',
+                timestamp: Date.now() - 345600000,
+                coordinates: {
+                    lat: 12.9916,
+                    lng: 77.6146
+                },
+                imageUrl: 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8'
+            },
+            {
+                id: '6',
+                title: 'Oil Spill in Harbor',
+                description: 'Small oil spill detected in the harbor area. Rainbow sheen visible on water surface.',
+                location: 'City Harbor',
+                status: 'pending',
+                timestamp: Date.now() - 432000000,
+                coordinates: {
+                    lat: 13.0016,
+                    lng: 77.6246
+                },
+                imageUrl: 'https://images.unsplash.com/photo-1612965607446-25e1332775ae'
+            },
+            {
+                id: '7',
+                title: 'Noise Pollution',
+                description: 'Construction site operating outside permitted hours causing disturbance.',
+                location: 'Downtown',
+                status: 'resolved',
+                timestamp: Date.now() - 518400000,
+                coordinates: {
+                    lat: 13.0116,
+                    lng: 77.6346
+                },
+                imageUrl: 'https://images.unsplash.com/photo-1617469767053-d3b523a0b982'
+            },
+            {
+                id: '8',
+                title: 'Soil Erosion',
+                description: 'Severe soil erosion noticed after recent construction activity. Risk to nearby structures.',
+                location: 'Hillside Area',
+                status: 'pending',
+                timestamp: Date.now() - 604800000,
+                coordinates: {
+                    lat: 13.0216,
+                    lng: 77.6446
+                },
+                imageUrl: 'https://images.unsplash.com/photo-1597495618548-f30d936dc862'
+            },
+            {
+                id: '9',
+                title: 'Illegal Mining',
+                description: 'Suspected illegal mining activity spotted in protected area during night hours.',
+                location: 'Mining District',
+                status: 'pending',
+                timestamp: Date.now() - 691200000,
+                coordinates: {
+                    lat: 13.0316,
+                    lng: 77.6546
+                },
+                imageUrl: 'https://images.unsplash.com/photo-1578319439584-104c94d37305'
+            }
+        ];
+
+        try {
+            await database.ref('reports').set(sampleReports);
+            console.log('Sample data added successfully');
+        } catch (error) {
+            console.error('Error adding sample data:', error);
+        }
+    }
+}
+
 // Auth state change listener
 auth.onAuthStateChanged((user) => {
     hideLoading();
     if (user) {
         loginModal.style.display = 'none';
         appContainer.style.display = 'block';
-        loginError.style.display = 'none';
+        errorMessage.style.display = 'none';
         emailInput.value = '';
         passwordInput.value = '';
         
-        // Initialize app when user is logged in
-        initializeApp();
+        // Initialize the app when user is logged in
+        initMap();
+        addSampleData().then(() => {
+            fetchReports();
+        });
+        
+        // Add event listeners for filters
+        document.getElementById('searchInput').addEventListener('input', filterAndSortReports);
+        document.getElementById('statusFilter').addEventListener('change', filterAndSortReports);
+        document.getElementById('sortBy').addEventListener('change', filterAndSortReports);
     } else {
         loginModal.style.display = 'block';
         appContainer.style.display = 'none';
@@ -353,51 +503,31 @@ auth.onAuthStateChanged((user) => {
 // Function to initialize the app
 function initializeApp() {
     // Add event listeners
-    document.getElementById('searchInput').addEventListener('input', filterAndSortReports);
-    document.getElementById('statusFilter').addEventListener('change', filterAndSortReports);
-    document.getElementById('sortBy').addEventListener('change', filterAndSortReports);
+    loginBtn.addEventListener('click', handleLogin);
     
-    // Map modal events
-    document.querySelector('.close').addEventListener('click', closeMapModal);
-    document.querySelector('.back-button').addEventListener('click', closeMapModal);
+    // Sign out button
+    const signOutBtn = document.createElement('button');
+    signOutBtn.className = 'sign-out-btn';
+    signOutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Sign Out';
+    signOutBtn.addEventListener('click', () => {
+        auth.signOut().then(() => {
+            showNotification('Successfully signed out');
+        }).catch((error) => {
+            console.error('Sign out error:', error);
+            showNotification('Error signing out', 'error');
+        });
+    });
     
-    window.addEventListener('click', (event) => {
-        const modal = document.getElementById('mapModal');
-        if (event.target === modal) {
+    document.querySelector('.logo-section').appendChild(signOutBtn);
+    
+    // Close map modal when clicking outside
+    const mapModal = document.getElementById('mapModal');
+    mapModal.addEventListener('click', (e) => {
+        if (e.target === mapModal) {
             closeMapModal();
         }
     });
-    
-    document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape') {
-            closeMapModal();
-        }
-    });
-    
-    // Fetch initial data
-    fetchReports();
 }
 
-// Event listeners
-loginBtn.addEventListener('click', handleLogin);
-
-// Sign out function
-function signOut() {
-    auth.signOut().catch(error => {
-        console.error('Error signing out:', error);
-        showNotification('Error signing out. Please try again.', 'error');
-    });
-}
-
-// Add sign out button to header
-const headerContent = document.querySelector('.header-content');
-const signOutBtn = document.createElement('button');
-signOutBtn.className = 'sign-out-btn';
-signOutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Sign Out';
-signOutBtn.onclick = signOut;
-headerContent.appendChild(signOutBtn);
-
-// Make functions globally available
-window.changeStatus = changeStatus;
-window.showOnMap = showOnMap;
-window.closeMapModal = closeMapModal;
+// Initialize the app
+initializeApp();

@@ -4,44 +4,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EcoMate Reports</title>
-    <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <!-- Login Modal -->
-    <div id="loginModal" class="modal">
+    <div id="loginModal" class="modal" style="display: block;">
         <div class="modal-content login-content">
             <div class="login-header">
                 <h2><i class="fas fa-leaf"></i> EcoMate Reports</h2>
             </div>
             <div class="login-form">
                 <div class="input-group">
-                    <label for="email">Email</label>
+                    <label for="email"><i class="fas fa-envelope"></i> Email</label>
                     <input type="email" id="email" placeholder="Enter your email">
                 </div>
                 <div class="input-group">
-                    <label for="password">Password</label>
+                    <label for="password"><i class="fas fa-lock"></i> Password</label>
                     <input type="password" id="password" placeholder="Enter your password">
                 </div>
-                <button id="loginBtn" class="login-btn">Login</button>
-                <p id="loginError" class="error-message"></p>
+                <button id="loginBtn" class="login-btn">
+                    <i class="fas fa-sign-in-alt"></i> Sign In
+                </button>
+                <div id="errorMessage" class="error-message"></div>
             </div>
         </div>
     </div>
 
-    <!-- Main App Container (Initially Hidden) -->
+    <!-- Main App Container -->
     <div id="appContainer" class="app-container" style="display: none;">
         <header class="main-header">
             <div class="header-content">
                 <div class="logo-section">
                     <i class="fas fa-leaf"></i>
                     <h1>EcoMate Reports</h1>
+                    <button id="signOutBtn" class="sign-out-btn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Sign Out
+                    </button>
                 </div>
                 <div class="stats-bar">
                     <div class="stat">
-                        <div class="stat-icon">
+                        <div class="stat-icon total">
                             <i class="fas fa-clipboard-list"></i>
                         </div>
                         <div class="stat-details">
@@ -72,68 +78,65 @@
         </header>
 
         <main class="main-content">
-            <div class="controls-section">
+            <section class="controls-section">
                 <div class="search-box">
                     <i class="fas fa-search"></i>
-                    <input type="text" id="searchInput" placeholder="Search reports...">
+                    <input type="text" id="searchInput" placeholder="Search reports by title or description...">
                 </div>
                 <div class="filters">
                     <div class="filter-group">
-                        <label><i class="fas fa-filter"></i> Filter Status:</label>
+                        <label><i class="fas fa-filter"></i> Filter by Status</label>
                         <select id="statusFilter">
-                            <option value="all">All Status</option>
+                            <option value="all">All Reports</option>
                             <option value="pending">Pending</option>
                             <option value="resolved">Resolved</option>
                         </select>
                     </div>
                     <div class="filter-group">
-                        <label><i class="fas fa-sort"></i> Sort By:</label>
+                        <label><i class="fas fa-sort"></i> Sort by</label>
                         <select id="sortBy">
                             <option value="newest">Newest First</option>
                             <option value="oldest">Oldest First</option>
                         </select>
                     </div>
                 </div>
-            </div>
+            </section>
 
-            <div class="reports-container" id="reportsContainer">
-                <!-- Reports will be dynamically loaded here -->
-            </div>
+            <section id="reportsContainer" class="reports-container">
+                <!-- Reports will be dynamically added here -->
+            </section>
         </main>
 
+        <!-- Map Modal -->
         <div id="mapModal" class="modal">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button class="back-button"><i class="fas fa-arrow-left"></i> Back to Reports</button>
-                    <span class="close">&times;</span>
+                    <h2><i class="fas fa-map-marker-alt"></i> Report Location</h2>
+                    <button class="back-button" onclick="closeMapModal()">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </button>
                 </div>
                 <div id="map"></div>
             </div>
         </div>
 
-        <div class="loading-spinner" id="loadingSpinner">
+        <!-- Loading Spinner -->
+        <div id="loadingSpinner" class="loading-spinner">
             <div class="spinner"></div>
-            <span>Loading reports...</span>
+            <span>Loading...</span>
+        </div>
+
+        <!-- Notification -->
+        <div id="notification" class="notification">
+            <i class="fas fa-check-circle"></i>
+            <span id="notificationMessage"></span>
         </div>
     </div>
 
-    <!-- Loading Spinner -->
-    <div class="loading-spinner">
-        <div class="spinner"></div>
-        <span>Loading...</span>
-    </div>
-
-    <!-- Notification -->
-    <div class="notification">
-        <i class="fas fa-check-circle"></i>
-        <span class="notification-message"></span>
-    </div>
-
-    <!-- Scripts -->
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
